@@ -1,4 +1,4 @@
-#include "power.hpp"
+#include "power.h"
 
 bool power::usbPower{false};
 

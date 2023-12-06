@@ -28,8 +28,28 @@
     </Filter>
     <FolderPairs>
         <Pair>
-            <Left/>
-            <Right/>
+            <Left>C:\Users\pasca\Documents\STM32WorkSpaces\MuMov2\NewProject\Core\Src</Left>
+            <Right>C:\Users\pasca\Documents\Projects\Software\NewProjectPIO\src</Right>
+        </Pair>
+        <Pair>
+            <Left>C:\Users\pasca\Documents\STM32WorkSpaces\MuMov2\NewProject\Core\Inc</Left>
+            <Right>C:\Users\pasca\Documents\Projects\Software\NewProjectPIO\include</Right>
+        </Pair>
+        <Pair>
+            <Left>C:\Users\pasca\Documents\STM32WorkSpaces\MuMov2\NewProject\lib</Left>
+            <Right>C:\Users\pasca\Documents\Projects\Software\NewProjectPIO\lib</Right>
+            <Filter>
+                <Include>
+                    <Item>gpio/*</Item>
+                    <Item>version/*</Item>
+                    <Item>logging/*</Item>
+                    <Item>sensors/*</Item>
+                </Include>
+                <Exclude/>
+                <TimeSpan Type="None">0</TimeSpan>
+                <SizeMin Unit="None">0</SizeMin>
+                <SizeMax Unit="None">0</SizeMax>
+            </Filter>
         </Pair>
     </FolderPairs>
     <Errors Ignore="false" Retry="0" Delay="5"/>

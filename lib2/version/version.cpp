@@ -1,5 +1,5 @@
-#include "version.hpp"
-#include "buildinfo.hpp"
+#include "version.h"
+#include "buildinfo.h"
 #include <stdio.h>
 
 uint8_t version::isVersionMajor{0};

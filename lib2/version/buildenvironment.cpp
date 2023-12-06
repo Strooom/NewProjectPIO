@@ -1,4 +1,4 @@
-#include "buildenvironment.hpp"
+#include "buildenvironment.h"
 
 const char* toString(buildEnvironment aBuildEnvironment) {
     switch (aBuildEnvironment) {

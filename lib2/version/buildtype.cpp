@@ -1,4 +1,4 @@
-#include "buildtype.hpp"
+#include "buildtype.h"
 
 const char* toString(buildType aBuildType) {
     switch (aBuildType) {

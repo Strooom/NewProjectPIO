@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
-#include "logging.hpp"
+#include "logging.h"
 
 #ifndef generic
 #include "main.h"                        // required for ITM_Sendchar
@@ -48,7 +48,7 @@ uint32_t logging::snprintf(source aSource, const char *format, ...) {
 void logging::write(uint32_t dataLength) {
     if (isActive(destination::debugProbe)) {
         for (uint32_t index = 0; index < dataLength; index++) {
-#ifndef generic
+#ifdef generic
             ITM_SendChar(static_cast<uint32_t>(buffer[index]));
 #endif
         }
