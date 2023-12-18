@@ -1,8 +1,8 @@
 #define unitTest
 #include <cstring>
 #include <unity.h>
-#include "version.h"
-#include "buildinfo.h"
+#include "version.hpp"
+#include "buildinfo.hpp"
 
 void setUp() {}
 void tearDown() {}

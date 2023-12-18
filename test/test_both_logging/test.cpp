@@ -5,7 +5,7 @@
 // ### License : https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode ###
 // #############################################################################
 #include <unity.h>
-#include "logging.h"
+#include "logging.hpp"
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test
