@@ -1,4 +1,4 @@
-#include "hexascii.h"
+#include <hexascii.hpp>
 #include "string.h"
 
 uint8_t hexAscii::toUpperCase(uint8_t aCharacter)

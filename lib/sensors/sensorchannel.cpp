@@ -80,9 +80,9 @@ void sensorChannel::addSample(float theSample) {
     samples[oversamplingCounter] = theSample;
 }
 
-// float sensorChannel::getOutput() {
-//     return average(getCurrentOversampling() + 1);
-// }
+float sensorChannel::getOutput() {
+    return average(getCurrentOversampling() + 1);
+}
 
 float sensorChannel::average(uint32_t nmbrOfSamples) const {
     if (nmbrOfSamples == 0) {

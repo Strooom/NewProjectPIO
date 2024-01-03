@@ -5,7 +5,7 @@
 // ### License : https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode ###
 // #############################################################################
 #include <unity.h>
-#include "bitmap.h"
+#include <bitmap.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

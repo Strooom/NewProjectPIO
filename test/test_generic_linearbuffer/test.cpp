@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "linearbuffer.h"
+#include <linearbuffer.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

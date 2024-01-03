@@ -14,9 +14,9 @@ void test_isPresent() {
 }
 
 void test_initialize() {
-    TEST_ASSERT_EQUAL(sensorState::boot, tsl2591::state);
+    TEST_ASSERT_EQUAL(sensorDeviceState::unknown, tsl2591::state);
     tsl2591::initialize();
-    TEST_ASSERT_EQUAL(sensorState::idle, tsl2591::state);
+    TEST_ASSERT_EQUAL(sensorDeviceState::standby, tsl2591::state);
 }
 
 void test_sample() {

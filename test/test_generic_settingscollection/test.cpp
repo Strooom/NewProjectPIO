@@ -1,6 +1,6 @@
 #include <unity.h>
-#include "settingscollection.h"
-#include "nvs.h"
+#include <settingscollection.hpp>
+#include <nvs.hpp>
 #include <stdio.h>
 
 void setUp(void) {}           // before test

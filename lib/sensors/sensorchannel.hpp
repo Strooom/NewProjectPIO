@@ -26,7 +26,7 @@ class sensorChannel {
     void adjustCounters();
 
     void addSample(float theSample);
-    float getLastValue(){return lastValue;}; 
+    float getOutput();
 
 #ifndef unitTesting
 

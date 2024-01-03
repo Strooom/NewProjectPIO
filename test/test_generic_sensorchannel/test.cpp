@@ -1,6 +1,6 @@
 #include <unity.h>
-#include "power.h"
-#include "sensorchannel.h"
+#include <power.hpp>
+#include <sensorchannel.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test
@@ -65,7 +65,7 @@ void test_getNextAction() {
 
     testChannel2.prescaleCounter     = 0;
     testChannel2.oversamplingCounter = 0;
-    TEST_ASSERT_EQUAL(sensorChannel::action::output, testChannel2.getNextAction());
+    TEST_ASSERT_EQUAL(sensorChannel::action::sampleAndOutput, testChannel2.getNextAction());
 }
 
 void test_adjustCounters() {
@@ -79,7 +79,7 @@ void test_adjustCounters() {
     sensorChannel testChannel2{sensorChannelType::none, 2, 2, 0, 0};        // = oversampling = 3, prescaling = 2
     TEST_ASSERT_EQUAL_UINT32(0, testChannel2.prescaleCounter);
     TEST_ASSERT_EQUAL_UINT32(0, testChannel2.oversamplingCounter);
-    TEST_ASSERT_EQUAL(sensorChannel::action::output, testChannel2.getNextAction());
+    TEST_ASSERT_EQUAL(sensorChannel::action::sampleAndOutput, testChannel2.getNextAction());
     testChannel2.adjustCounters();
     TEST_ASSERT_EQUAL_UINT32(1, testChannel2.prescaleCounter);
     TEST_ASSERT_EQUAL_UINT32(2, testChannel2.oversamplingCounter);
@@ -103,7 +103,7 @@ void test_adjustCounters() {
     testChannel2.adjustCounters();
     TEST_ASSERT_EQUAL_UINT32(0, testChannel2.prescaleCounter);
     TEST_ASSERT_EQUAL_UINT32(0, testChannel2.oversamplingCounter);
-    TEST_ASSERT_EQUAL(sensorChannel::action::output, testChannel2.getNextAction());
+    TEST_ASSERT_EQUAL(sensorChannel::action::sampleAndOutput, testChannel2.getNextAction());
 }
 
 void test_addSample() {

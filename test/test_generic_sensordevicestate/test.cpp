@@ -1,6 +1,6 @@
 #include <unity.h>
-#include "power.h"
-#include "sensordevicestate.h"
+#include <power.hpp>
+#include <sensordevicestate.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

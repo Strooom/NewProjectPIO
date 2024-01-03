@@ -1,6 +1,6 @@
 #include <unity.h>
-#include "power.h"
-#include "sensordevicetype.h"
+#include <power.hpp>
+#include <sensordevicetype.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test
@@ -12,7 +12,6 @@ void test_dummy_for_coverage() {
     TEST_ASSERT_EQUAL_STRING("bme688", toString(sensorDeviceType::bme688));
     TEST_ASSERT_EQUAL_STRING("tsl2591", toString(sensorDeviceType::tsl2591));
     TEST_ASSERT_EQUAL_STRING("sht40", toString(sensorDeviceType::sht40));
-    TEST_ASSERT_EQUAL_STRING("veml7700", toString(sensorDeviceType::veml7700));
     TEST_ASSERT_EQUAL_STRING("lis3dh", toString(sensorDeviceType::lis3dh));
 }
 

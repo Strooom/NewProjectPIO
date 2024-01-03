@@ -41,6 +41,7 @@ class display {
     static void setPixel(uint32_t x, uint32_t y);
     static void clearPixel(uint32_t x, uint32_t y);
     static void clearAllPixels();
+    static bool getPixel(uint32_t x, uint32_t y);
 
     static constexpr uint32_t widthInPixels{200};                     // [pixels]
     static constexpr uint32_t heightInPixels{200};                    // [pixels]

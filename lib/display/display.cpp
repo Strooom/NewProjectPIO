@@ -116,6 +116,17 @@ void display::clearAllPixels() {
     }
 }
 
+bool display::getPixel(uint32_t x, uint32_t y) {
+    if (isInBounds(x, y)) {
+        rotateAndMirrorCoordinates(x, y);
+        uint32_t byteOffset = getByteOffset(x, y);
+        uint32_t bitOffset  = getBitOffset(x);
+        return ((displayBuffer[byteOffset] & (1 << bitOffset)) == 0);
+    } else {
+        return false;
+    }
+}
+
 // void display::changePixel(uint32_t x, uint32_t y, bool onOff) {
 //     if (!isInBounds(x, y)) {        // NOTE : as our display is 200 x 200, we could already perform this check earlier (eg in graphics::drawPixel), and avoid executing some code in case the pixel is out of bounds
 //         return;

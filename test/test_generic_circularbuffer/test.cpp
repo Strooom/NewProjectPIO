@@ -1,6 +1,6 @@
 #include <unity.h>
 
-#include "circularbuffer.h"
+#include <circularbuffer.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

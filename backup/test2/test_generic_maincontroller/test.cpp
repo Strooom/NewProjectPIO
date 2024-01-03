@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "circularbuffer.h"
+#include <circularbuffer.hpp>
 #include "applicationevent.h"
 #include "lorawanevent.h"
 #include "maincontroller.h"

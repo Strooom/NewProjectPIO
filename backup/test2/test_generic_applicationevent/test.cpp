@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "power.h"
+#include <power.hpp>
 #include "applicationevent.h"
 
 void setUp(void) {}           // before test

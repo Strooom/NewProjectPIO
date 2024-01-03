@@ -93,7 +93,7 @@ void bme680::initialize() {
 }
 
 float bme680::getLastChannelValue(uint32_t index) {
-    return channels[index].getLastValue();
+    return channels[index].getOutput();
 }
 
 void bme680::tick() {

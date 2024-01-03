@@ -1,6 +1,6 @@
 #include <unity.h>
-#include "measurementcollection.h"
-#include "sensortype.h"
+#include <measurementcollection.hpp>
+#include <sensortype.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

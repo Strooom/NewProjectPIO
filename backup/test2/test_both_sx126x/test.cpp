@@ -5,7 +5,7 @@
 // ### License : https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode ###
 // #############################################################################
 #include <unity.h>
-#include "sx126x.h"
+#include <sx126x.hpp>
 
 uint8_t mockSX126xDataBuffer[256];            // unitTesting mock for the LoRa Rx/Tx buffer, inside the SX126x
 uint8_t mockSX126xRegisters[0x1000];          // unitTesting mock for the config registers, inside the SX126x

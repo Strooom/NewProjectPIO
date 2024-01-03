@@ -17,7 +17,7 @@ void battery::initalize() {
 }
 
 float battery::getLastChannelValue(uint32_t index) {
-    return channels[index].getLastValue();
+    return channels[index].getOutput();
 }
 
 void battery::tick() {

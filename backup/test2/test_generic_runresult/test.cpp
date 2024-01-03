@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "runresult.h"
+#include <runresult.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

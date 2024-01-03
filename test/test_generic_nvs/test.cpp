@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "nvs.h"
+#include <nvs.hpp>
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test

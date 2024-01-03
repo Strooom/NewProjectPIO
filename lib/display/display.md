@@ -42,17 +42,12 @@ when writing a byte to the display : the MSbit is the *first* pixel
 * seems a '1' pixel is blank and a '0' pixel is black
 
 # Fonts
-* seems a font table covers all printable ASCII characters = [32, 126] (so degrees symbol 248 is not part of the standard font, but I could eg move it to 127)
-* each character has a height (pixels), resulting in rows of bytes
-* each character has a width (pixels), resulting in 1 or more bytes, eg Font 16x11 has 16 x 2 bytes per charachter. Each row has two bytes, of which only the first 11 pixels are used.
+* Bitmapped fonts can be generated from TrueType fonts using the TheDotFactory.exe, a settings file is available in OutputConfigs.xml
+* As these fonts are proportional, each font needs 3 pieces of data
+  - fontProperties : height, spacing, first char, last char
+  - characterProperties : an array with for each character the offset and lenght into the pixelData
+  - pixelData
 
-So in order to define such a font in C++ we have following class
-
-class font {
-    uint32_t pixelheight{16};
-    uint32_t pixelwidth{11};
-    uint32_t bytesPerRow{ceiling(width / 8)}
-}
 
 # Drawing text :
 * draw a single charachter
@@ -62,7 +57,7 @@ class font {
 * otherwise you need to also draw the inactive pixels..
 * drawing a character, is basically drawing a bitmap (of a certain size), so it makes sense to do draw bitmaps first and to use it for drawing character
 
-Partial Update : instead of updating all pixels, you can only update the modified ones. In order to allow this, we need to keep track of lowerX, upperX, lowerY and upperY which define a rectangle constraining pixel modifications.
+# Partial Update : instead of updating all pixels, you can only update the modified ones. In order to allow this, we need to keep track of lowerX, upperX, lowerY and upperY which define a rectangle constraining pixel modifications.
 
 
 # Icons
