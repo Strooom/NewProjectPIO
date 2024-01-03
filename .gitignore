@@ -75,3 +75,6 @@ Debug/*.mk
 SYNC.md
 *.ffs_gui
 *.ffs_db
+
+
+*.bkp
