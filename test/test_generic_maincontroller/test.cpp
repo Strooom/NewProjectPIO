@@ -1,6 +1,6 @@
 #include <unity.h>
 #include <circularbuffer.hpp>
-#include "applicationevent.h"
+#include <applicationevent.hpp>
 #include "lorawanevent.h"
 #include "maincontroller.h"
 

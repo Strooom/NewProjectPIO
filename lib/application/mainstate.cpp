@@ -11,17 +11,20 @@ const char *toString(mainState aState) {
         case mainState::boot:
             return "boot";
             break;
+        case mainState::idle:
+            return "idle";
+            break;
+        case mainState::measuring:
+            return "measuring";
+            break;
+        case mainState::storingAndDisplaying:
+            return "storing and displaying";
+            break;
+        case mainState::networking:
+            return "networking";
+            break;
         case mainState::sleeping:
             return "sleeping";
-            break;
-        case mainState::sampling:
-            return "sampling";
-            break;
-        case mainState::storing:
-            return "storing";
-            break;
-        case mainState::sending:
-            return "sending";
             break;
         default:
             return "unknown";

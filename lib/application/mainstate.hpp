@@ -9,10 +9,11 @@
 
 enum class mainState : uint32_t {
     boot,
-    sleeping,
-    sampling,
-    storing,
-    sending,
+    idle,
+    measuring,
+    storingAndDisplaying,
+    networking,
+    sleeping
 };
 
 const char* toString(const mainState aState);

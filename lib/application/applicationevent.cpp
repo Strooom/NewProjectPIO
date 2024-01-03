@@ -1,4 +1,4 @@
-#include "applicationevent.h"
+#include <applicationevent.hpp>
 
 const char* toString(applicationEvent anEvent) {
     switch (anEvent) {

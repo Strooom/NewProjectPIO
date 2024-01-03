@@ -5,30 +5,32 @@
 // ### License : https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode ###
 // #############################################################################
 
-#include "maincontroller.h"
-#include "settingscollection.h"
-#include "sensordevicecollection.h"
-#include "measurementcollection.h"
-#include "logging.hpp"
+#include <maincontroller.hpp>
+#include <circularbuffer.hpp>
+#include <applicationevent.hpp>
 
-#include "circularbuffer.h"
-#include "applicationevent.h"
-#include "display.h"
-#include "lorawan.h"
+//#include "settingscollection.h"
+//#include "sensordevicecollection.h"
+//#include "measurementcollection.h"
+
+#include "logging.hpp"
+#include <display.hpp>
+
+//#include "lorawan.h"
 
 mainState mainController::theMainState{mainState::boot};
 extern circularBuffer<applicationEvent, 16U> applicationEventBuffer;
 
 void mainController::initialize() {
-    if (nonVolatileStorage::isPresent()) {
-        if (!settingsCollection::isInitialized()) {
-            settingsCollection::initializeOnce();
-        }
-    }
+    // if (nonVolatileStorage::isPresent()) {
+    //     if (!settingsCollection::isInitialized()) {
+    //         settingsCollection::initializeOnce();
+    //     }
+    // }
 
-    sensorDeviceCollection::discover();
+    // sensorDeviceCollection::discover();
 
-    LoRaWAN::initialize();
+    // LoRaWAN::initialize();
 }
 
 void mainController::handleEvents() {
@@ -50,7 +52,7 @@ void mainController::handleEvents() {
             } break;
 
             case applicationEvent::realTimeClockTick: {
-                sensorDeviceCollection::run();
+                //sensorDeviceCollection::run();
                 // measurementCollection::run();
                 //  3. check if we should do a transmission, ie. we have data to send
 

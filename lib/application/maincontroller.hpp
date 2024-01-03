@@ -8,7 +8,7 @@
 #pragma once
 
 #include <stdint.h>
-#include "mainstate.h"
+#include <mainstate.hpp>
 
 class mainController {
   public:
