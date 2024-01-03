@@ -145,7 +145,7 @@ jobs:
             // ###   .github/workflows/testbuildrelease.yml for CI environment        ###
             // ### Changes will be overwritten on the next build                      ###
             // ##########################################################################
-            #include "buildinfo.h"
+            #include <buildinfo.hpp>
             const buildEnvironment buildInfo::theBuildEnvironment{buildEnvironment::ci};
             const buildType buildInfo::theBuildType{buildType::production};
             const int buildInfo::mainVersionDigit   = ${{ steps.selectversion.outputs.nextmajordigit }};

@@ -40,7 +40,7 @@ include_file.write("// ###   .github/workflows/testbuildrelease.yml for CI envir
 include_file.write("// ### Changes will be overwritten on the next build                      ###\n")
 include_file.write("// ##########################################################################\n")
 include_file.write("\n")
-include_file.write("#include \"buildinfo.h\"\n")
+include_file.write("#include <buildinfo.hpp>\n")
 include_file.write("\n")
 include_file.write("const buildEnvironment buildInfo::theBuildEnvironment{buildEnvironment::local};\n")
 include_file.write("const buildType buildInfo::theBuildType{buildType::development};\n")
