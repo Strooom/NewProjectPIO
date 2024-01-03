@@ -4,7 +4,7 @@
 // ### License : CC 4.0 BY-NC-SA - https://creativecommons.org/licenses/by-nc-sa/4.0/ ###
 // ######################################################################################
 
-#include "mainstate.h"
+#include <mainstate.hpp>
 
 const char *toString(mainState aState) {
     switch (aState) {

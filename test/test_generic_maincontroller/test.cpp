@@ -1,11 +1,11 @@
 #include <unity.h>
 #include <circularbuffer.hpp>
 #include <applicationevent.hpp>
-#include "lorawanevent.h"
-#include "maincontroller.h"
+//#include "lorawanevent.h"
+#include <maincontroller.hpp>
 
 circularBuffer<applicationEvent, 16U> applicationEventBuffer;
-circularBuffer<loRaWanEvent, 16U> loraWanEventBuffer;
+//circularBuffer<loRaWanEvent, 16U> loraWanEventBuffer;
 
 uint8_t mockSX126xDataBuffer[256];            // unitTesting mock for the LoRa Rx/Tx buffer, inside the SX126x
 uint8_t mockSX126xRegisters[0x1000];          // unitTesting mock for the config registers, inside the SX126x
@@ -24,9 +24,10 @@ void test_initialize() {
 void test_toString() {
     // for test coverage only
     TEST_ASSERT_EQUAL_STRING("boot", toString(mainState::boot));
-    TEST_ASSERT_EQUAL_STRING("sampling", toString(mainState::sampling));
-    TEST_ASSERT_EQUAL_STRING("storing", toString(mainState::storing));
-    TEST_ASSERT_EQUAL_STRING("sending", toString(mainState::sending));
+    TEST_ASSERT_EQUAL_STRING("idle", toString(mainState::idle));
+    TEST_ASSERT_EQUAL_STRING("measuring", toString(mainState::measuring));
+    TEST_ASSERT_EQUAL_STRING("storing and displaying", toString(mainState::storingAndDisplaying));
+    TEST_ASSERT_EQUAL_STRING("networking", toString(mainState::networking));
     TEST_ASSERT_EQUAL_STRING("sleeping", toString(mainState::sleeping));
 }
 
