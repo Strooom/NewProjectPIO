@@ -1,7 +1,7 @@
 // #include <iostream> // TODO : don't know why this was included, but it consumes 150Kbytes of flash :-(
 #include "lorawan.h"
 #include "sx126x.h"
-#include "logging.h"
+#include "logging.hpp"
 #include "circularbuffer.h"
 #include "lorawanevent.h"
 #include "settingscollection.h"

@@ -1,7 +1,7 @@
 #include "sensordevicecollection.h"
 // All known sensor devices are to be included here
 #include "bme680.h"
-#include "tsl2591.h"
+#include "tsl2591.hpp"
 
 bool sensorDeviceCollection::isPresent[static_cast<uint32_t>(sensorDeviceType::nmbrOfKnownDevices)]{false};
 uint32_t sensorDeviceCollection::actualNumberOfDevices{0};

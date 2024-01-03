@@ -22,6 +22,12 @@ enum class displayMirroring : uint32_t {
     both
 };
 
+enum class displayPresence : uint32_t {
+    unknown,
+    present,
+    notPresent
+};
+
 class display {
   public:
     display() = delete;
@@ -32,11 +38,9 @@ class display {
     static void clear();                           // write blank data to display
     static void update(updateMode theMode);        // refresh display
 
-    static void setPixel(uint32_t x, uint32_t y);                       // takes into account the rotation and mirroring settings, so clients don't have to worry about this
-    static void clearPixel(uint32_t x, uint32_t y);                     // takes into account the rotation and mirroring settings, so clients don't have to worry about this
-    static void changePixel(uint32_t x, uint32_t y, bool onOff);        // takes into account the rotation and mirroring settings, so clients don't have to worry about this
-
-    static void clearAllPixels();        // sets complete displayBuffer to zeroes
+    static void setPixel(uint32_t x, uint32_t y);
+    static void clearPixel(uint32_t x, uint32_t y);
+    static void clearAllPixels();
 
     static constexpr uint32_t widthInPixels{200};                     // [pixels]
     static constexpr uint32_t heightInPixels{200};                    // [pixels]
@@ -47,6 +51,7 @@ class display {
   private:
 #endif
 
+    static displayPresence displayPresent;
     static constexpr uint32_t bufferSize{widthInPixels * heightInPixels / 8};        // 1 bit per pixel
     static uint8_t displayBuffer[bufferSize];
 
@@ -57,7 +62,7 @@ class display {
         DEEP_SLEEP_MODE                      = 0x10,
         DATA_ENTRY_MODE_SETTING              = 0x11,
         SW_RESET                             = 0x12,
-        TEMPERATURE_SENSOR_CONTROL           = 0x1A,
+        TEMPERATURE_SENSOR_SELECTION         = 0x18,
         MASTER_ACTIVATION                    = 0x20,
         DISPLAY_UPDATE_CONTROL_1             = 0x21,
         DISPLAY_UPDATE_CONTROL_2             = 0x22,
@@ -78,24 +83,26 @@ class display {
     static displayRotation rotation;
     static displayMirroring mirroring;
 
-    static void reset();
-    static void setDataOrCommand(bool isData);
-    static void selectChip(bool active);
-    static bool isBusy();
+    static void hardwareReset();                      // drive display-reset line down for 10ms
+    static void softwareReset();                      // send software reset command to display
+    static void setDataOrCommand(bool isData);        // controls the D/C line
+    static void selectChip(bool active);              // controls the CS line
+    static bool isBusy();                             // checks the display busy line
 
-    static void write(uint8_t *data, uint32_t length);        // write an array of bytes to the display
-    static void write(uint8_t data);                          // write a single byte to the display
-    static void writeData(uint8_t data);
-    static void writeCommand(SSD1681Commands theCommand, uint8_t *data, uint32_t length);
-    static void writeData(uint8_t *data, uint32_t length);
+    static void writeCommand(SSD1681Commands theCommand, uint8_t *data, uint32_t length);        // write a command with optionally some data parameters
+    static void writeData(uint8_t *data, uint32_t length);                                       //
+    static void writeData(uint8_t data);                                                         //
+    static void write(uint8_t *data, uint32_t length);                                           // write an array of bytes to the display
+    static void write(uint8_t data);                                                             // write a single byte to the display
 
     static void waitWhileBusy();
 
+    static void rotateCoordinates(uint32_t &x, uint32_t &y);
+    static void mirrorCoordinates(uint32_t &x, uint32_t &y);
     static void rotateAndMirrorCoordinates(uint32_t &x, uint32_t &y);
-    static bool inBounds(uint32_t c);
-    static bool inBounds(uint32_t x, uint32_t y);
+    static bool isInBounds(uint32_t x, uint32_t y) { return ((x < display::widthInPixels) && (y < display::heightInPixels)); };
     static void swapCoordinates(uint32_t &c1, uint32_t &c2);
-    static void mirrorCoordinate(uint32_t &c, uint32_t maxC);
-    static uint32_t getByteOffset(uint32_t x, uint32_t y);
-    static uint32_t getBitOffset(uint32_t x);
+    static void mirrorCoordinate(uint32_t &c, uint32_t maxC) { c = (maxC - 1) - c; };
+    static uint32_t getByteOffset(uint32_t x, uint32_t y) { return ((y * widthInBytes) + (x / 8)); };
+    static uint32_t getBitOffset(uint32_t x) { return (7 - (x % 8)); };
 };

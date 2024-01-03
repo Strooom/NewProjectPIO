@@ -44,6 +44,7 @@
                     <Item>version/*</Item>
                     <Item>logging/*</Item>
                     <Item>sensors/*</Item>
+                    <Item>display/*</Item>
                 </Include>
                 <Exclude/>
                 <TimeSpan Type="None">0</TimeSpan>

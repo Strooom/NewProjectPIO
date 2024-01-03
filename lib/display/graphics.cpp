@@ -25,39 +25,87 @@ void graphics::drawVerticalLine(uint32_t x, uint32_t yStart, uint32_t yEnd, colo
     }
 }
 
-// void graphics::drawLine(uint32_t xStart, uint32_t yStart, uint32_t xEnd, uint32_t yEnd, color theColor) {
-//     // Catch vertical and horizontal lines and send them to the dedicated functions
-//     if (xStart == xEnd) {
-//         drawVerticalLine(xStart, yStart, yEnd, theColor);
-//         return;
-//     }
-//     if (yStart == yEnd) {
-//         drawHorizontalLine(xStart, xEnd, yStart, theColor);
-//         return;
-//     }
-//     // Hello Bresenham, it's been 35 years since I first saw you ;-)
-//     {
-//         int32_t deltaX{xEnd - xStart};
-//         int32_t deltaY{yEnd - yStart};
-//         int32_t twiceDeltaY                 = 2 * deltaY;
-//         int32_t twiceDeltaYMinusTwiceDeltaX = 2 * (deltaY - deltaX);
-//         int32_t decisionMaker               = (2 * deltaY) - deltaX;
+void graphics::drawLine(uint32_t xStart, uint32_t yStart, uint32_t xEnd, uint32_t yEnd, color theColor) {
+    // Catch vertical and horizontal lines and send them to the dedicated functions
+    if (xStart == xEnd) {
+        drawVerticalLine(xStart, yStart, yEnd, theColor);
+        return;
+    }
+    if (yStart == yEnd) {
+        drawHorizontalLine(xStart, xEnd, yStart, theColor);
+        return;
+    }
+    // Hello Bresenham, it's been 35 years since I first saw you ;-)
+    {
+        int dx  = xEnd - xStart >= 0 ? xEnd - xStart : xStart - xEnd;
+        int sx  = xStart < xEnd ? 1 : -1;
+        int dy  = yEnd - yStart <= 0 ? yEnd - yStart : yStart - yEnd;
+        int sy  = yStart < yEnd ? 1 : -1;
+        int err = dx + dy;
 
-//         uint32_t buffer_x = xStart;
-//         uint32_t buffer_y = yStart;
+        while ((xStart != xEnd) && (yStart != yEnd)) {
+            drawPixel(xStart, yStart, theColor);
+            if (2 * err >= dy) {
+                err += dy;
+                xStart += sx;
+            }
+            if (2 * err <= dx) {
+                err += dx;
+                yStart += sy;
+            }
+        }
+    }
+}
 
-//         while (buffer_x != xEnd) {
-//             drawPixel(buffer_x, buffer_y, theColor);
-//             buffer_x++;
+void graphics::drawCircle(uint32_t x, uint32_t y, uint32_t radius, color theColor) {
+    /* Bresenham algorithm */
+    int x_pos = -radius;
+    int y_pos = 0;
+    int err   = 2 - 2 * radius;
+    int e2;
 
-//             if (decisionMaker < 0) {
-//                 decisionMaker += twiceDeltaY;
-//             } else {
-//                 buffer_y++;
-//                 decisionMaker += twiceDeltaYMinusTwiceDeltaX;
-//             }
-//         }
-//     }
+    do {
+        drawPixel(x - x_pos, y + y_pos, theColor);
+        drawPixel(x + x_pos, y + y_pos, theColor);
+        drawPixel(x + x_pos, y - y_pos, theColor);
+        drawPixel(x - x_pos, y - y_pos, theColor);
+        e2 = err;
+        if (e2 <= y_pos) {
+            err += ++y_pos * 2 + 1;
+            if (-x_pos == y_pos && e2 <= x_pos) {
+                e2 = 0;
+            }
+        }
+        if (e2 > x_pos) {
+            err += ++x_pos * 2 + 1;
+        }
+    } while (x_pos <= 0);
+}
+
+void graphics::drawFilledCircle(uint32_t x, uint32_t y, uint32_t radius, color theColor) {
+    int x_pos = -radius;
+    int y_pos = 0;
+    int err   = 2 - 2 * radius;
+    int e2;
+
+    do {
+        drawHorizontalLine(x + x_pos, x - x_pos, y + y_pos, theColor);
+        drawHorizontalLine(x + x_pos, x - x_pos, y - y_pos, theColor);
+        e2 = err;
+        if (e2 <= y_pos) {
+            err += ++y_pos * 2 + 1;
+            if (-x_pos == y_pos && e2 <= x_pos) {
+                e2 = 0;
+            }
+        }
+        if (e2 > x_pos) {
+            err += ++x_pos * 2 + 1;
+        }
+    } while (x_pos <= 0);
+}
+
+// void Paint::DrawFilledCircle(int x, int y, int radius, int colored) {
+//     /* Bresenham algorithm */
 // }
 
 void graphics::drawRectangle(uint32_t xStart, uint32_t yStart, uint32_t xEnd, uint32_t yEnd, color theLineColor) {
@@ -89,21 +137,28 @@ void graphics::drawBitMap(uint32_t xStart, uint32_t yStart, const bitmap &theBit
     }
 }
 
-void graphics::drawCharacter(uint32_t xStart, uint32_t yStart, const font &theFont, uint8_t theCharacter) {
-    for (uint32_t x = 0; x < theFont.width; x++) {
-        for (uint32_t y = 0; y < theFont.height; y++) {
-            if (theFont.getPixel(x, y, theCharacter)) {
+void graphics::drawCharacter(const uint32_t xStart, const uint32_t yStart, const font &theFont, const uint8_t theCharacter) {
+    if (!theFont.charIsInBounds(theCharacter)) {
+        return;
+    }
+    uint32_t widthInPixels          = theFont.getCharacterWidthInPixels(theCharacter);
+    uint32_t characterOffsetInBytes = theFont.getOffsetInBytes(theCharacter);
+
+    for (uint32_t x = 0; x < widthInPixels; x++) {
+        for (uint32_t y = 0; y < theFont.properties.heightInPixels; y++) {
+            if (theFont.getPixel(x, y, characterOffsetInBytes)) {
                 drawPixel(xStart + x, yStart + y, color::black);
             }
         }
     }
 }
 
-void graphics::drawText(uint32_t xStart, uint32_t yStart, const font &theFont, const char *theText) {
-    uint32_t maxStringLength = ((display::widthInPixels - xStart) / theFont.width) + 1;
+void graphics::drawText(const uint32_t xStart, const uint32_t y, const font &theFont, const char *theText) {
+    uint32_t xPos{xStart};
     uint32_t charachterIndex{0};
-    while (theText[charachterIndex] != '\0' && charachterIndex < maxStringLength) {
-        drawCharacter(xStart + (charachterIndex * theFont.width), yStart, theFont, theText[charachterIndex]);
+    while (theText[charachterIndex] != '\0' && xPos < display::widthInPixels) {
+        drawCharacter(xPos, y, theFont, theText[charachterIndex]);
+        xPos = xPos + theFont.getCharacterWidthInPixels(theText[charachterIndex]) + theFont.properties.spaceBetweenCharactersInPixels;
         charachterIndex++;
     }
 }

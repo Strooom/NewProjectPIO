@@ -4,7 +4,7 @@
 
 #include <stdint.h>
 #include <stdio.h>        // for snprintf()...
-#include "logging.h"
+#include "logging.hpp"
 #include "circularbuffer.h"
 #include "applicationevent.h"
 #include "txrxcycle.h"
@@ -18,7 +18,7 @@
 #include "nvs.h"
 #include "measurementcollection.h"
 #include "bme680.h"
-#include "tsl2591.h"
+#include "tsl2591.hpp"
 #include "gpio.h"
 
 ADC_HandleTypeDef hadc;

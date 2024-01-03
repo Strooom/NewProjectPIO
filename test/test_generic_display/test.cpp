@@ -5,25 +5,20 @@
 // ### License : https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode ###
 // #############################################################################
 #include <unity.h>
-#include "display.h"
+#include "display.hpp"
 
 void setUp(void) {}           // before test
 void tearDown(void) {}        // after test
 
-void test_inBounds() {
-    uint32_t displayWidthHeight{display::widthInPixels};        // 200
-    TEST_ASSERT_TRUE(display::inBounds(0));
-    TEST_ASSERT_TRUE(display::inBounds(displayWidthHeight - 1));
-    TEST_ASSERT_FALSE(display::inBounds(displayWidthHeight));
+void test_isInBounds() {
+    TEST_ASSERT_TRUE(display::isInBounds(0, 0));
+    TEST_ASSERT_TRUE(display::isInBounds(0, display::heightInPixels - 1));
+    TEST_ASSERT_TRUE(display::isInBounds(display::widthInPixels - 1, 0));
+    TEST_ASSERT_TRUE(display::isInBounds(display::widthInPixels - 1, display::heightInPixels - 1));
 
-    TEST_ASSERT_TRUE(display::inBounds(0, 0));
-    TEST_ASSERT_TRUE(display::inBounds(0, displayWidthHeight - 1));
-    TEST_ASSERT_TRUE(display::inBounds(displayWidthHeight - 1, 0));
-    TEST_ASSERT_TRUE(display::inBounds(displayWidthHeight - 1, displayWidthHeight - 1));
-
-    TEST_ASSERT_FALSE(display::inBounds(displayWidthHeight, 0));
-    TEST_ASSERT_FALSE(display::inBounds(0, displayWidthHeight));
-    TEST_ASSERT_FALSE(display::inBounds(displayWidthHeight, displayWidthHeight));
+    TEST_ASSERT_FALSE(display::isInBounds(0, display::heightInPixels));
+    TEST_ASSERT_FALSE(display::isInBounds(display::widthInPixels, 0));
+    TEST_ASSERT_FALSE(display::isInBounds(display::widthInPixels, display::heightInPixels));
 }
 
 void test_swapCoordinates() {
@@ -128,52 +123,31 @@ void test_setPixel() {
     display::mirroring = displayMirroring::none;
     display::rotation  = displayRotation::rotation0;
     display::setPixel(0, 0);
-    TEST_ASSERT_EQUAL(0b10000000, display::displayBuffer[0]);
+    TEST_ASSERT_EQUAL(0b01111111, display::displayBuffer[0]);
     display::setPixel((display::widthInPixels - 1), 0);
-    TEST_ASSERT_EQUAL(0b00000001, display::displayBuffer[24]);
+    TEST_ASSERT_EQUAL(0b11111110, display::displayBuffer[24]);
     display::setPixel(0, (display::heightInPixels - 1));
-    TEST_ASSERT_EQUAL(0b10000000, display::displayBuffer[5000 - 25]);
+    TEST_ASSERT_EQUAL(0b01111111, display::displayBuffer[5000 - 25]);
     display::setPixel((display::widthInPixels - 1), (display::heightInPixels - 1));
-    TEST_ASSERT_EQUAL(0b00000001, display::displayBuffer[5000 - 1]);
+    TEST_ASSERT_EQUAL(0b11111110, display::displayBuffer[5000 - 1]);
 }
 
 void test_clearPixel() {
     // set all pixels
     for (uint32_t i = 0; i < display::bufferSize; i++) {
-        display::displayBuffer[i] = 0xFF;        // sets all pixels on, so we can easily test the clearPixel function
+        display::displayBuffer[i] = 0x00;        // sets all pixels on, so we can easily test the clearPixel function
     }
     display::mirroring = displayMirroring::none;
     display::rotation  = displayRotation::rotation0;
 
     display::clearPixel(0, 0);
-    TEST_ASSERT_EQUAL(0b01111111, display::displayBuffer[0]);
+    TEST_ASSERT_EQUAL(0b10000000, display::displayBuffer[0]);
     display::clearPixel((display::widthInPixels - 1), 0);
-    TEST_ASSERT_EQUAL(0b11111110, display::displayBuffer[24]);
+    TEST_ASSERT_EQUAL(0b00000001, display::displayBuffer[24]);
     display::clearPixel(0, (display::heightInPixels - 1));
-    TEST_ASSERT_EQUAL(0b01111111, display::displayBuffer[5000 - 25]);
+    TEST_ASSERT_EQUAL(0b10000000, display::displayBuffer[5000 - 25]);
     display::clearPixel((display::widthInPixels - 1), (display::heightInPixels - 1));
-    TEST_ASSERT_EQUAL(0b11111110, display::displayBuffer[5000 - 1]);
-}
-
-void test_changePixel() {
-    display::clearAllPixels();
-    display::mirroring = displayMirroring::none;
-    display::rotation  = displayRotation::rotation0;
-    for (uint32_t y = 0; y < display::heightInPixels; y++) {
-        for (uint32_t x = 0; x < display::widthInPixels; x++) {
-            display::changePixel(x, y, ((x + y) % 2));
-        }
-    }
-
-    for (uint32_t y = 0; y < display::heightInPixels; y++) {
-        for (uint32_t x = 0; x < (display::widthInPixels / 8); x++) {
-            if (y % 2) {
-                TEST_ASSERT_EQUAL(0b10101010, display::displayBuffer[25 * y + x]);
-            } else {
-                TEST_ASSERT_EQUAL(0b01010101, display::displayBuffer[25 * y + x]);
-            }
-        }
-    }
+    TEST_ASSERT_EQUAL(0b00000001, display::displayBuffer[5000 - 1]);
 }
 
 void test_changePixelOutOfBounds() {
@@ -181,12 +155,12 @@ void test_changePixelOutOfBounds() {
     display::mirroring = displayMirroring::none;
     display::rotation  = displayRotation::rotation0;
 
-    display::changePixel(200, 0, true);        // set some pixels outside the display area
-    display::changePixel(0, 200, true);
-    display::changePixel(200, 200, true);
+    display::setPixel(200, 0);        // set some pixels outside the display area
+    display::setPixel(0, 200);
+    display::setPixel(200, 200);
 
     for (uint32_t i = 0; i < display::bufferSize; i++) {
-        TEST_ASSERT_EQUAL(0, display::displayBuffer[i]);        // all of the displaybuffer should still be cleared
+        TEST_ASSERT_EQUAL(0xFF, display::displayBuffer[i]);        // all of the displaybuffer should still be cleared
     }
 }
 
@@ -198,7 +172,7 @@ void test_dummy() {
 
 int main(int argc, char **argv) {
     UNITY_BEGIN();
-    RUN_TEST(test_inBounds);
+    RUN_TEST(test_isInBounds);
     RUN_TEST(test_swapCoordinates);
     RUN_TEST(test_mirrorCoordinate);
     RUN_TEST(test_mirrorCoordinates);
@@ -207,7 +181,6 @@ int main(int argc, char **argv) {
     RUN_TEST(test_getBitOffset);
     RUN_TEST(test_setPixel);
     RUN_TEST(test_clearPixel);
-    RUN_TEST(test_changePixel);
     RUN_TEST(test_changePixelOutOfBounds);
     RUN_TEST(test_dummy);
     UNITY_END();

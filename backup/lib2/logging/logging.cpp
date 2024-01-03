@@ -8,7 +8,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cstdarg>
-#include "logging.h"
+#include "logging.hpp"
 
 #ifndef generic
 #include "main.h"                        // required for ITM_Sendchar

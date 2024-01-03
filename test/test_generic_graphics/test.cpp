@@ -5,8 +5,8 @@
 // ### License : https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode ###
 // #############################################################################
 #include <unity.h>
-#include "graphics.h"
-#include "display.h"
+#include "graphics.hpp"
+#include "display.hpp"
 
 extern font couriernew12;
 

@@ -9,7 +9,7 @@
 #include "settingscollection.h"
 #include "sensordevicecollection.h"
 #include "measurementcollection.h"
-#include "logging.h"
+#include "logging.hpp"
 
 #include "circularbuffer.h"
 #include "applicationevent.h"

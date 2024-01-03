@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "tsl2591.h"
+#include "tsl2591.hpp"
 
 uint8_t mockTSL2591Registers[256];
 

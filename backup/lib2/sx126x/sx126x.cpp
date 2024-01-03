@@ -6,7 +6,7 @@
 // #############################################################################
 
 #include "sx126x.h"
-#include "logging.h"
+#include "logging.hpp"
 
 #ifndef generic
 #include "main.h"

@@ -7,27 +7,45 @@
 #pragma once
 #include <stdint.h>
 
+class fontProperties {
+  public:
+    fontProperties(const uint32_t thePixelHeight, const uint32_t theSpaceBetweenCharactersInPixels, const uint8_t theAsciiStart, const uint8_t theAsciiEnd) : heightInPixels(thePixelHeight),
+                                                                                                            spaceBetweenCharactersInPixels(theSpaceBetweenCharactersInPixels),
+                                                                                                            bytesPerRow(((thePixelHeight - 1) / 8) + 1),
+                                                                                                            asciiStart(theAsciiStart),
+                                                                                                            asciiEnd(theAsciiEnd){};
+
+    const uint32_t heightInPixels;
+    const uint32_t spaceBetweenCharactersInPixels;
+    const uint32_t bytesPerRow;
+    const uint8_t asciiStart;
+    const uint8_t asciiEnd;
+};
+
+class characterProperties {
+  public:
+    const uint32_t widthInPixels;
+    const uint32_t offsetInBytes;
+};
+
 class font {
   public:
-    font(const uint32_t thePixelHeight, const uint32_t thePixelWidth, const uint8_t* thePixelData) : height(thePixelHeight), width(thePixelWidth), bytesPerRow(((thePixelWidth - 1) / 8) + 1), bytesPerCharacter(height * bytesPerRow), pixelData(thePixelData){};
-    bool getPixel(uint32_t x, uint32_t y, uint8_t asciiCode) const;
+    font(const fontProperties &theProperties, const characterProperties *theCharacters, const uint8_t *robotoMedium24BoldPixelData) : properties(theProperties),
+                                                                                                                                      characters(theCharacters),
+                                                                                                                                      pixelData(robotoMedium24BoldPixelData){};
 
-    const uint32_t height;        // [pixels]
-    const uint32_t width;         // [pixels]
-    const uint32_t bytesPerRow;
-    const uint32_t bytesPerCharacter;
-    const uint8_t* pixelData;
-
-    static constexpr uint8_t asciiStart = 32;        // making this static implies that ALL fonts have the characterset : 32..126
-    static constexpr uint8_t asciiEnd   = 126;
+    bool charIsInBounds(uint8_t asciiCode) const;
+    uint32_t getCharacterWidthInPixels(uint8_t asciiCode) const;
+    uint32_t getOffsetInBytes(uint8_t asciiCode) const;
+    bool getPixel(uint32_t x, uint32_t y, uint32_t pixelDataOffset) const;
+    const fontProperties &properties;
+    const characterProperties *characters;
+    const uint8_t *pixelData;
 
 #ifndef unitTesting
 
   private:
 #endif
-    inline static bool isInBounds(uint8_t asciiCode) { return (asciiCode >= asciiStart && asciiCode <= asciiEnd); }
-    inline bool isInBounds(uint32_t x, uint32_t y) const { return (x < width && y < height); };
-    uint32_t getByteIndex(uint8_t asciiCode) const { return (asciiCode - asciiStart) * bytesPerRow * height; }           // no bounds checking here, private helper function
-    uint32_t getByteIndex(uint32_t x, uint32_t y) const { return (((height - 1) - y) * bytesPerRow) + (x / 8); };        // no bounds checking here, private helper function
-    inline uint8_t getBitIndex(uint32_t x) const { return 7 - (x % 8); };                                                // no bounds checking here, private helper function
+    uint32_t getOffsetInBytes(uint32_t x, uint32_t y) const {return (properties.bytesPerRow * x) + (y / 8);};
+    static inline uint8_t getBitIndex(uint32_t y) { return 7 - (y % 8); };
 };

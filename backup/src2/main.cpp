@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-#include "logging.h"               // logging to SWO and/or UART
+#include "logging.hpp"               // logging to SWO and/or UART
 #include "circularbuffer.h"        // needed for global applicationEventBuffer and loraWanEventBuffer
 #include "applicationevent.h"
 #include "version.h"

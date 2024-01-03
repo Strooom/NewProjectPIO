@@ -16,20 +16,31 @@ extern SPI_HandleTypeDef hspi2;
 // extern peripheralRegister PORTC_BSRR;
 // extern peripheralRegister PORTB_IDR;
 
-// Initialize the static variables
-
-displayRotation display::rotation{displayRotation::rotation0};
+displayPresence display::displayPresent{displayPresence::unknown};
+displayRotation display::rotation{displayRotation::rotation270};
 displayMirroring display::mirroring{displayMirroring::none};
-uint8_t display::displayBuffer[display::bufferSize]{0};
+uint8_t display::displayBuffer[display::bufferSize];
 
 bool display::isPresent() {
-    reset();
-    return isBusy();        // if busy after reset, display is present. If not present, a pulldown resistor will keep busy low
-    // TODO : this does not put the display back to sleep !!
+    if (displayPresent == displayPresence::unknown) {
+        hardwareReset();
+        goSleep();
+#ifndef generic
+        HAL_Delay(1U);
+#endif
+        if (isBusy()) {
+            displayPresent = displayPresence::present;
+        } else {
+            displayPresent = displayPresence::notPresent;
+        }
+    }
+    return (displayPresent == displayPresence::present);
 }
 
 void display::initialize() {
-    reset();
+    hardwareReset();
+    waitWhileBusy();
+    softwareReset();
     waitWhileBusy();
 
     uint8_t commandData[4]{0};
@@ -40,7 +51,7 @@ void display::initialize() {
     writeCommand(SSD1681Commands::DRIVER_OUTPUT_CONTROL, commandData, 3);
     waitWhileBusy();
 
-    commandData[0] = 0x01;
+    commandData[0] = 0x11;        // from example - don't know what this does
     writeCommand(SSD1681Commands::DATA_ENTRY_MODE_SETTING, commandData, 1);
     waitWhileBusy();
 
@@ -60,8 +71,9 @@ void display::initialize() {
     writeCommand(SSD1681Commands::BORDER_WAVEFORM_CONTROL, commandData, 1);
     waitWhileBusy();
 
-    // EPD_W21_WriteCMD(0x18);        // Read built-in temperature sensor
-    // EPD_W21_WriteDATA(0x80);
+    commandData[0] = 0x80;        // Selects internal temperature sensor
+    writeCommand(SSD1681Commands::TEMPERATURE_SENSOR_SELECTION, commandData, 1);
+    waitWhileBusy();
 
     commandData[0] = 0x0;
     writeCommand(SSD1681Commands::SET_RAM_X_ADDRESS_COUNTER, commandData, 1);
@@ -71,6 +83,8 @@ void display::initialize() {
     commandData[1] = 0x00;        // this seems to be (height - 1) / 256
     writeCommand(SSD1681Commands::SET_RAM_Y_ADDRESS_COUNTER, commandData, 2);
     waitWhileBusy();
+
+    clearAllPixels();
 }
 
 void display::goSleep() {
@@ -79,42 +93,40 @@ void display::goSleep() {
 }
 
 void display::setPixel(uint32_t x, uint32_t y) {
-    uint32_t byteOffset       = getByteOffset(x, y);
-    uint32_t bitOffset        = getBitOffset(x);
-    displayBuffer[byteOffset] = displayBuffer[byteOffset] | (1 << bitOffset);
+    if (isInBounds(x, y)) {
+        rotateAndMirrorCoordinates(x, y);
+        uint32_t byteOffset       = getByteOffset(x, y);
+        uint32_t bitOffset        = getBitOffset(x);
+        displayBuffer[byteOffset] = displayBuffer[byteOffset] & ~(1 << bitOffset);
+    }
 }
 
 void display::clearPixel(uint32_t x, uint32_t y) {
-    uint32_t byteOffset       = getByteOffset(x, y);
-    uint32_t bitOffset        = getBitOffset(x);
-    displayBuffer[byteOffset] = displayBuffer[byteOffset] & ~(1 << bitOffset);
+    if (isInBounds(x, y)) {
+        rotateAndMirrorCoordinates(x, y);
+        uint32_t byteOffset       = getByteOffset(x, y);
+        uint32_t bitOffset        = getBitOffset(x);
+        displayBuffer[byteOffset] = displayBuffer[byteOffset] | (1 << bitOffset);
+    }
 }
 
 void display::clearAllPixels() {
     for (uint32_t i = 0; i < bufferSize; i++) {
-        displayBuffer[i] = 0;
+        displayBuffer[i] = 0xFF;
     }
 }
 
-void display::changePixel(uint32_t x, uint32_t y, bool onOff) {
-    if (!inBounds(x, y)) {        // NOTE : as our display is 200 x 200, we could already perform this check earlier (eg in graphics::drawPixel), and avoid executing some code in case the pixel is out of bounds
-        return;
-    }
-    rotateAndMirrorCoordinates(x, y);
-    if (onOff) {
-        setPixel(x, y);
-    } else {
-        clearPixel(x, y);
-    }
-}
-
-bool display::inBounds(uint32_t c) {
-    return (c < display::widthInPixels);
-}
-
-bool display::inBounds(uint32_t x, uint32_t y) {
-    return (inBounds(x) && inBounds(y));
-}
+// void display::changePixel(uint32_t x, uint32_t y, bool onOff) {
+//     if (!isInBounds(x, y)) {        // NOTE : as our display is 200 x 200, we could already perform this check earlier (eg in graphics::drawPixel), and avoid executing some code in case the pixel is out of bounds
+//         return;
+//     }
+//     rotateAndMirrorCoordinates(x, y);
+//     if (onOff) {
+//         setPixel(x, y);
+//     } else {
+//         clearPixel(x, y);
+//     }
+// }
 
 void display::swapCoordinates(uint32_t& c1, uint32_t& c2) {
     uint32_t temp = c1;
@@ -122,22 +134,8 @@ void display::swapCoordinates(uint32_t& c1, uint32_t& c2) {
     c2            = temp;
 }
 
-void display::mirrorCoordinate(uint32_t& c, uint32_t maxC) {
-    c = (maxC - 1) - c;
-}
-
-uint32_t display::getByteOffset(uint32_t x, uint32_t y) {
-    return ((y * widthInBytes) + (x / 8));
-}
-
-uint32_t display::getBitOffset(uint32_t x) {
-    return (7 - (x % 8));
-}
-
-void display::rotateAndMirrorCoordinates(uint32_t& x, uint32_t& y) {
+void display::rotateCoordinates(uint32_t& x, uint32_t& y) {
     switch (display::rotation) {
-        case displayRotation::rotation0:
-            break;
         case displayRotation::rotation90:
             swapCoordinates(x, y);
             mirrorCoordinate(y, display::heightInPixels);
@@ -150,11 +148,14 @@ void display::rotateAndMirrorCoordinates(uint32_t& x, uint32_t& y) {
             swapCoordinates(x, y);
             mirrorCoordinate(x, display::widthInPixels);
             break;
-    }
-
-    switch (display::mirroring) {
-        case displayMirroring::none:
+        case displayRotation::rotation0:
+        default:
             break;
+    }
+}
+
+void display::mirrorCoordinates(uint32_t& x, uint32_t& y) {
+    switch (display::mirroring) {
         case displayMirroring::horizontal:
             mirrorCoordinate(x, display::widthInPixels);
             break;
@@ -165,10 +166,18 @@ void display::rotateAndMirrorCoordinates(uint32_t& x, uint32_t& y) {
             mirrorCoordinate(x, display::widthInPixels);
             mirrorCoordinate(y, display::heightInPixels);
             break;
+        default:
+        case displayMirroring::none:
+            break;
     }
 }
 
-void display::reset() {
+void display::rotateAndMirrorCoordinates(uint32_t& x, uint32_t& y) {
+    rotateCoordinates(x, y);
+    mirrorCoordinates(x, y);
+}
+
+void display::hardwareReset() {
 #ifndef generic
     HAL_GPIO_WritePin(GPIOA, displayReset_Pin, GPIO_PIN_RESET);
     // PORTA_BSRR.write(1 << 0);               // reset = LOW
@@ -176,7 +185,13 @@ void display::reset() {
     HAL_GPIO_WritePin(GPIOA, displayReset_Pin, GPIO_PIN_SET);
     // PORTA_BSRR.write(1 << (0 + 16));        // reset = HIGH
     HAL_Delay(10U);        //
+#endif
+}
+
+void display::softwareReset() {
     writeCommand(SSD1681Commands::SW_RESET, nullptr, 0);
+#ifndef generic
+    HAL_Delay(10U);        // datasheet, section 4.2
 #endif
 }
 
@@ -309,17 +324,18 @@ void display::clear() {
 
 void display::update(updateMode theMode) {
     writeCommand(SSD1681Commands::WRITE_RAM, nullptr, 0);
-    // now write data from RAM to display
+    writeData(displayBuffer, bufferSize);
 
-    // for (i = 0; i < EPD_ARRAY; i++) {
-    //     EPD_W21_WriteDATA(datas[i]);
-    // }
+    // uint8_t commandData[1]{0xC4};
 
-    uint8_t commandData[1]{0xC4};
-    writeCommand(SSD1681Commands::DISPLAY_UPDATE_CONTROL_2, commandData, 1);
+    writeCommand(SSD1681Commands::DISPLAY_UPDATE_CONTROL_2, nullptr, 0);
+    // writeData(0xF7);
+
     switch (theMode) {
         default:
         case updateMode::full:
+            // ITM->PORT[0].u8 = 0xFF;
+            writeData(0xF7);
             // EPD_W21_WriteDATA(0xF7);  TODO : some more commands need to be reverse engineered here..
             break;
         case updateMode::fast:
@@ -330,7 +346,10 @@ void display::update(updateMode theMode) {
             break;
     }
     writeCommand(SSD1681Commands::MASTER_ACTIVATION, nullptr, 0);
-    writeCommand(SSD1681Commands::TERMINATE_FRAME_READ_WRITE, nullptr, 0);        // TODO : this does not seem to be used in example SW
+    waitWhileBusy();
+    // ITM->PORT[0].u8 = 0x00;
+
+    // writeCommand(SSD1681Commands::TERMINATE_FRAME_READ_WRITE, nullptr, 0);        // TODO : this does not seem to be used in example SW
 }
 
 // static void EPD_SetMemoryArea(EPD* epd, int x_start, int y_start, int x_end, int y_end) {

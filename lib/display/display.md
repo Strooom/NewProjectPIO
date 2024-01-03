@@ -1,12 +1,12 @@
 # Low-level display hardware vs 'High-level' graphics API
 
-display.h / .cpp : 
+display.hpp / .cpp : 
 * driving the displays electrical signals
 * writing commands and raw data bytes to the display
 * manipulating pixels on the display buffer
 * flushing the display buffer towards the display hardware
 
-graphics.h / .cpp
+graphics.hpp / .cpp
 * translate higher level graphics commands into raw pixel commands : drawing objects
     * line
     * rectangle
@@ -63,3 +63,11 @@ class font {
 * drawing a character, is basically drawing a bitmap (of a certain size), so it makes sense to do draw bitmaps first and to use it for drawing character
 
 Partial Update : instead of updating all pixels, you can only update the modified ones. In order to allow this, we need to keep track of lowerX, upperX, lowerY and upperY which define a rectangle constraining pixel modifications.
+
+
+# Icons
+* open website https://fonts.google.com/icons
+* set to 48 pixels
+* download icon as PNG
+* open then image2cpp https://javl.github.io/image2cpp/
+* select icon file and generate code

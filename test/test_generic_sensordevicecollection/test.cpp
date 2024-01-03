@@ -1,8 +1,8 @@
 #include <unity.h>
-#include "power.h"
-#include "sensordevicecollection.h"
-#include "bme680.h"
-#include "tsl2591.h"
+#include "power.hpp"
+#include "sensordevicecollection.hpp"
+#include "bme680.hpp"
+#include "tsl2591.hpp"
 
 uint8_t mockBME680Registers[256];
 uint8_t mockTSL2591Registers[256];
@@ -28,14 +28,10 @@ void test_discover() {
     TEST_ASSERT_EQUAL_UINT32(3U, sensorDeviceCollection::actualNumberOfDevices);
 }
 
-void test_dummy_for_coverage() {
-    TEST_IGNORE_MESSAGE("For testCoverage only");
-}
 
 int main(int argc, char **argv) {
     UNITY_BEGIN();
     RUN_TEST(test_initalize);
     RUN_TEST(test_discover);
-    RUN_TEST(test_dummy_for_coverage);
     UNITY_END();
 }
