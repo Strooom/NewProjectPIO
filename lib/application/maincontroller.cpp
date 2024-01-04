@@ -6,31 +6,90 @@
 // #############################################################################
 
 #include <maincontroller.hpp>
-#include <circularbuffer.hpp>
 #include <applicationevent.hpp>
-
-//#include "settingscollection.h"
-//#include "sensordevicecollection.h"
-//#include "measurementcollection.h"
-
-#include "logging.hpp"
+#include <circularbuffer.hpp>
+#include <version.hpp>
+#include <logging.hpp>
+#include <sensordevicecollection.hpp>
 #include <display.hpp>
+#include <gpio.hpp>
+#include <power.hpp>
+#include <settingscollection.hpp>
 
-//#include "lorawan.h"
+#ifndef generic
+#include "main.h"
+#endif
 
-mainState mainController::theMainState{mainState::boot};
+mainState mainController::state{mainState::boot};
 extern circularBuffer<applicationEvent, 16U> applicationEventBuffer;
 
 void mainController::initialize() {
-    // if (nonVolatileStorage::isPresent()) {
-    //     if (!settingsCollection::isInitialized()) {
-    //         settingsCollection::initializeOnce();
-    //     }
+    version::setIsVersion();
+    initializeLogging();
+
+    // gpio::enableGpio(gpio::group::i2c);
+    // gpio::enableGpio(gpio::group::writeProtect);
+    // gpio::enableGpio(gpio::group::rfControl);
+
+
+    sensorDeviceCollection::discover();
+
+    if (nonVolatileStorage::isPresent()) {
+        if (!settingsCollection::isInitialized()) {
+            settingsCollection::initializeOnce();
+        }
+    }
+
+    // gpio::enableGpio(gpio::group::spiDisplay);
+    // if (display::isPresent()) {
+    //     logging::snprintf("Display present\n");
+    // } else {
+    //     logging::snprintf("Display not present\n");
     // }
 
-    // sensorDeviceCollection::discover();
 
-    // LoRaWAN::initialize();
+    // LoRaWAN::initialize(); // initialize the LoRaWAN network driver
+    state = mainState::idle;
+}
+
+void mainController::initializeLogging() {
+#ifndef generic
+    if ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) == 0x0001) {        // if there is a SWD debugprobe connected...
+        logging::enable(logging::destination::debugProbe);                     // enable the output to SWO
+    }
+#else
+    logging::disable(logging::destination::debugProbe);
+
+#endif
+
+    gpio::enableGpio(gpio::group::usbPresent);
+    if (power::hasUsbPower()) {                             // if there is USB power...
+        logging::enable(logging::destination::uart);        // enable the output to UART
+    }
+
+    logging::snprintf("MuMo v2 - %s - Boot\n", version::getIsVersionAsString());
+    logging::snprintf("Creative Commons 4.0 - BY-NC-SA\n");
+
+    if (logging::isActive(logging::destination::debugProbe)) {
+#ifndef generic
+        LL_DBGMCU_EnableDBGStopMode();
+#endif
+        logging::snprintf("debugProbe connected\n");
+    } else {
+#ifndef generic
+        LL_DBGMCU_DisableDBGStopMode();        // no debugging in low power -> the MCU will really stop the clock
+#endif
+        gpio::disableGpio(gpio::group::debugPort);        // these IOs are enabled by default after reset, but as there is no debug probe, we disable them to reduce power consumption
+    }
+
+    if (logging::isActive(logging::destination::uart)) {
+        logging::snprintf("USB connected\n");
+    }
+
+    logging::enable(logging::source::criticalError);
+    logging::enable(logging::source::error);
+    logging::enable(logging::source::applicationEvents);
+
 }
 
 void mainController::handleEvents() {
@@ -52,9 +111,9 @@ void mainController::handleEvents() {
             } break;
 
             case applicationEvent::realTimeClockTick: {
-                //sensorDeviceCollection::run();
-                // measurementCollection::run();
-                //  3. check if we should do a transmission, ie. we have data to send
+                // sensorDeviceCollection::run();
+                //  measurementCollection::run();
+                //   3. check if we should do a transmission, ie. we have data to send
 
                 // sensorCollection::runResult theResult = theSensors.run();
                 // if (theResult == sensorCollection::runResult::newMeasurements) {
@@ -108,12 +167,4 @@ void mainController::handleEvents() {
                 break;
         }
     }
-// sensorDeviceCollection::run();
-// measurementCollection::run();
-// display::run();
-// LoRaWAN::run();
-
-
-
-
 }

@@ -1,6 +1,5 @@
 #include <sensortype.hpp>
 #include <battery.hpp>
-#include <adc.hpp>
 //#include <settingscollection.hpp>
 #include <sensorchannel.hpp>
 
@@ -33,7 +32,7 @@ void battery::tick() {
 }
 
 void battery::run() {
-    if ((state == sensorDeviceState::sampling) && stm32wle5_adc::isReady()) {
+    if ((state == sensorDeviceState::sampling)  /*&& stm32wle5_adc::isReady()*/) {
         if (channels[voltage].needsSampling()) {
             // channels[voltage].lastValue = ADC::getVoltage();
         }

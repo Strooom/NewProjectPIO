@@ -31,7 +31,7 @@ void gpio::enableDisableGpio(group theGroup, bool enable) {
                 GPIO_InitStruct.Pin   = rfControl1_Pin | rfControl2_Pin;
                 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
                 GPIO_InitStruct.Pull  = GPIO_NOPULL;
-                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
                 HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
             } else {
                 HAL_GPIO_DeInit(GPIOA, rfControl1_Pin | rfControl2_Pin);
@@ -71,7 +71,7 @@ void gpio::enableDisableGpio(group theGroup, bool enable) {
                 GPIO_InitStruct.Pin   = writeProtect_Pin;
                 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
                 GPIO_InitStruct.Pull  = GPIO_NOPULL;
-                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
                 HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
             } else {
                 HAL_GPIO_DeInit(GPIOB, writeProtect_Pin);
@@ -103,7 +103,7 @@ void gpio::enableDisableGpio(group theGroup, bool enable) {
                 GPIO_InitStruct.Pin   = displayReset_Pin;
                 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
                 GPIO_InitStruct.Pull  = GPIO_NOPULL;
-                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
                 HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
                 // PB14     ------> displayDataCommand
@@ -111,7 +111,7 @@ void gpio::enableDisableGpio(group theGroup, bool enable) {
                 GPIO_InitStruct.Pin   = displayDataCommand_Pin | displayChipSelect_Pin;
                 GPIO_InitStruct.Mode  = GPIO_MODE_OUTPUT_PP;
                 GPIO_InitStruct.Pull  = GPIO_NOPULL;
-                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
+                GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
                 HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
                 // PA10     ------> SPI2_MOSI

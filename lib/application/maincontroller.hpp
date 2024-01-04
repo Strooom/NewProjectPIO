@@ -20,7 +20,6 @@ class mainController {
 
   private:
 #endif
-    // ### Properties ###
-    // ### StateMachines ###
-    static mainState theMainState;
+    static void initializeLogging();
+    static mainState state;
 };
